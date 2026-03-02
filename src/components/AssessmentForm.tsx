@@ -173,8 +173,7 @@ export default function AssessmentForm() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <div className="text-center mb-10">
           <img src="/logo.png" alt="Havenly" className="h-20 sm:h-24 mx-auto mb-4" />
-          <div className="w-16 h-px bg-accent mx-auto mt-2" />
-          <p className="font-serif text-lg text-text-secondary mt-4 italic">
+          <p className="font-serif text-lg text-text-secondary italic">
             Premium In-Person Assessment
           </p>
         </div>
