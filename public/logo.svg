@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" fill="none">
+  <!-- Circle with H -->
+  <g transform="translate(20, 10)">
+    <!-- Main circle -->
+    <circle cx="50" cy="50" r="40" stroke="#8B7355" stroke-width="2" fill="none"/>
+    <!-- H letter -->
+    <text x="50" y="62" text-anchor="middle" font-family="Georgia, serif" font-size="48" font-weight="bold" fill="#8B7355">H</text>
+    <!-- Top leaf cluster -->
+    <g transform="translate(72, 8) rotate(-30)">
+      <ellipse cx="0" cy="-8" rx="3" ry="7" fill="#8B7355" transform="rotate(-20)"/>
+      <ellipse cx="6" cy="-10" rx="2.5" ry="6" fill="#8B7355" transform="rotate(10)"/>
+      <ellipse cx="-4" cy="-6" rx="2" ry="5" fill="#8B7355" transform="rotate(-40)"/>
+      <path d="M0,0 C2,-6 4,-10 6,-14" stroke="#8B7355" stroke-width="1" fill="none"/>
+      <path d="M0,0 C-2,-4 -3,-6 -4,-10" stroke="#8B7355" stroke-width="1" fill="none"/>
+    </g>
+    <!-- Bottom decorative vine -->
+    <g transform="translate(50, 90)">
+      <path d="M0,0 C4,2 6,6 4,10 C2,8 6,4 2,2" stroke="#8B7355" stroke-width="1.2" fill="none"/>
+      <ellipse cx="5" cy="8" rx="2" ry="4" fill="#8B7355" transform="rotate(30)"/>
+      <ellipse cx="-2" cy="6" rx="1.5" ry="3.5" fill="#8B7355" transform="rotate(-20)"/>
+    </g>
+  </g>
+  <!-- Havenly text -->
+  <text x="130" y="58" font-family="Georgia, serif" font-size="44" font-weight="bold" fill="#3D3225" letter-spacing="2">Havenly</text>
+  <!-- Tagline -->
+  <text x="132" y="80" font-family="Arial, sans-serif" font-size="13" fill="#8B7355" letter-spacing="4" text-transform="uppercase">MAKING YOUR HOME A HAVEN</text>
+</svg>

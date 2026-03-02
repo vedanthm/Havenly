@@ -1,4 +1,4 @@
-import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, Text, View, Image, StyleSheet } from "@react-pdf/renderer";
 import type { RoomData } from "./RoomAssessment";
 
 const ROOMS = [
@@ -21,10 +21,14 @@ const c = {
 };
 
 const s = StyleSheet.create({
-  page: { paddingTop: 40, paddingBottom: 50, paddingHorizontal: 36, backgroundColor: c.white, fontSize: 10, color: c.text },
-  footer: { position: "absolute", bottom: 20, left: 36, right: 36, textAlign: "center", fontSize: 7, color: c.textMuted, letterSpacing: 1 },
+  page: { paddingTop: 60, paddingBottom: 50, paddingHorizontal: 36, backgroundColor: c.white, fontSize: 10, color: c.text },
+  pageHeader: { position: "absolute", top: 0, left: 0, right: 0, flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 36, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: c.border },
+  pageHeaderTitle: { fontSize: 12, fontWeight: "light", letterSpacing: 4, color: c.text },
+  pageHeaderTagline: { fontSize: 6, letterSpacing: 2, color: c.textMuted, textTransform: "uppercase" },
+  footer: { position: "absolute", bottom: 0, left: 0, right: 0, flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 36, paddingVertical: 12, borderTopWidth: 1, borderTopColor: c.border },
+  footerText: { fontSize: 7, color: c.textMuted, letterSpacing: 1 },
 
-  // Header
+  // Hero Header (page 1 only)
   headerWrap: { alignItems: "center", marginBottom: 28 },
   title: { fontSize: 28, fontWeight: "light", letterSpacing: 6, color: c.text },
   tagline: { fontSize: 8, letterSpacing: 4, color: c.textMuted, textTransform: "uppercase", marginTop: 2 },
@@ -82,7 +86,8 @@ interface FormData {
   homeStatus: string;
   primaryObjective: string;
   timeline: string;
-  investmentRange: string;
+  selectedPackage: string;
+  supportStaff: string;
   homeFeel: string[];
   frustrations: string;
   rooms: Record<string, RoomData>;
@@ -140,9 +145,23 @@ const SectionHead = ({ num, title }: { num: number; title: string }) => (
   </View>
 );
 
+const PageHeader = ({ logoUrl }: { logoUrl: string }) => (
+  <View style={s.pageHeader} fixed>
+    <Image src={logoUrl} style={{ height: 24, width: 85 }} />
+    <Text style={s.pageHeaderTagline}>Premium In-Person Assessment</Text>
+  </View>
+);
+
+const PageFooter = ({ page, total }: { page: number; total: number }) => (
+  <View style={s.footer} fixed>
+    <Text style={s.footerText}>HAVENLY Premium Assessment</Text>
+    <Text style={s.footerText}>Page {page} of {total}</Text>
+  </View>
+);
+
 // --- Main Document ---
 
-export default function PdfDocument({ form }: { form: FormData }) {
+export default function PdfDocument({ form, logoUrl }: { form: FormData; logoUrl: string }) {
   const selectedFeel = form.homeFeel || [];
   const selectedBuyer = form.buyerProfile || [];
 
@@ -150,9 +169,9 @@ export default function PdfDocument({ form }: { form: FormData }) {
     <Document>
       {/* Page 1: Header + Client Profile + Vision */}
       <Page size="A4" style={s.page}>
+        <PageHeader logoUrl={logoUrl} />
         <View style={s.headerWrap}>
-          <Text style={s.title}>HAVENLY</Text>
-          <Text style={s.tagline}>Make Your Home a Haven</Text>
+          <Image src={logoUrl} style={{ height: 60, width: 210, marginBottom: 8 }} />
           <View style={s.divider} />
           <Text style={s.subtitle}>Premium In-Person Assessment</Text>
         </View>
@@ -170,7 +189,8 @@ export default function PdfDocument({ form }: { form: FormData }) {
           <Chips label="Home Status" options={["Occupied", "Vacant", "Partially Furnished"]} selected={form.homeStatus ? [form.homeStatus] : []} />
           <Chips label="Primary Objective" options={["Sale", "Lifestyle Upgrade", "Decluttering", "Luxury Styling", "Full Transformation"]} selected={form.primaryObjective ? [form.primaryObjective] : []} />
           <Field label="Timeline" value={form.timeline} />
-          <Chips label="Investment Range (AED)" options={["5–15K", "15–30K", "30–60K", "60K+"]} selected={form.investmentRange ? [form.investmentRange] : []} />
+          <Chips label="Package" options={["Refresh", "Elevate", "Signature", "Bespoke"]} selected={form.selectedPackage ? [form.selectedPackage] : []} />
+          <Chips label="Support Staff" options={["Havenly", "By Client"]} selected={form.supportStaff ? [form.supportStaff] : []} />
         </View>
 
         <View style={s.section}>
@@ -179,11 +199,12 @@ export default function PdfDocument({ form }: { form: FormData }) {
           <TextBlock label="Biggest Frustrations" value={form.frustrations} />
         </View>
 
-        <Text style={s.footer}>HAVENLY Premium Assessment</Text>
+        <PageFooter page={1} total={3} />
       </Page>
 
       {/* Page 2: Room-by-Room Assessment */}
       <Page size="A4" style={s.page}>
+        <PageHeader logoUrl={logoUrl} />
         <View style={s.section}>
           <SectionHead num={3} title="Room-by-Room Premium Assessment" />
           <Text style={s.tableNote}>
@@ -217,11 +238,12 @@ export default function PdfDocument({ form }: { form: FormData }) {
           </View>
         </View>
 
-        <Text style={s.footer}>HAVENLY Premium Assessment</Text>
+        <PageFooter page={2} total={3} />
       </Page>
 
       {/* Page 3: Staging + Scope + Signatures */}
       <Page size="A4" style={s.page}>
+        <PageHeader logoUrl={logoUrl} />
         <View style={s.section}>
           <SectionHead num={4} title="Staging-Specific Evaluation" />
           <Chips label="Target Buyer Profile" options={["Young Professionals", "Families", "Luxury Buyers", "Investors"]} selected={selectedBuyer} />
@@ -244,9 +266,14 @@ export default function PdfDocument({ form }: { form: FormData }) {
               <Field label="Date" value={form.consultantSignDate} />
             </View>
           </View>
+
+          <View style={{ marginTop: 20 }}>
+            <Text style={s.label}>Client Signature</Text>
+            <View style={{ height: 50, borderBottomWidth: 1, borderBottomColor: c.text }} />
+          </View>
         </View>
 
-        <Text style={s.footer}>HAVENLY Premium Assessment</Text>
+        <PageFooter page={3} total={3} />
       </Page>
     </Document>
   );

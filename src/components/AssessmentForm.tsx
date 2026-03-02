@@ -21,7 +21,8 @@ interface FormData {
   homeStatus: string;
   primaryObjective: string;
   timeline: string;
-  investmentRange: string;
+  selectedPackage: string;
+  supportStaff: string;
   homeFeel: string[];
   frustrations: string;
   rooms: Record<string, RoomData>;
@@ -48,7 +49,8 @@ const defaultFormData: FormData = {
   homeStatus: "",
   primaryObjective: "",
   timeline: "",
-  investmentRange: "",
+  selectedPackage: "",
+  supportStaff: "",
   homeFeel: [],
   frustrations: "",
   rooms: getDefaultRooms(),
@@ -104,7 +106,8 @@ export default function AssessmentForm() {
   const handleDownloadPDF = async () => {
     setGenerating(true);
     try {
-      const blob = await pdf(<PdfDocument form={form} />).toBlob();
+      const logoUrl = `${window.location.origin}/logo.png`;
+      const blob = await pdf(<PdfDocument form={form} logoUrl={logoUrl} />).toBlob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -146,15 +149,8 @@ export default function AssessmentForm() {
     <div className="min-h-screen bg-cream">
       {/* Header */}
       <header className="bg-white border-b border-border sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="font-serif text-3xl sm:text-4xl font-light tracking-[0.2em] text-text-primary">
-              HAVENLY
-            </h1>
-            <p className="text-xs tracking-[0.2em] uppercase text-text-muted font-sans mt-0.5">
-              Make Your Home a Haven
-            </p>
-          </div>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+          <img src="/logo.png" alt="Havenly" className="h-10 sm:h-12" />
           <button
             onClick={handleClear}
             className="text-xs tracking-wider uppercase text-text-muted hover:text-accent font-sans transition-colors"
@@ -176,13 +172,8 @@ export default function AssessmentForm() {
       {/* Form Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <div className="text-center mb-10">
-          <h1 className="font-serif text-4xl sm:text-5xl font-light tracking-[0.2em] text-text-primary mb-2">
-            HAVENLY
-          </h1>
-          <p className="text-sm tracking-[0.25em] uppercase text-text-muted font-sans">
-            Make Your Home a Haven
-          </p>
-          <div className="w-16 h-px bg-accent mx-auto mt-4" />
+          <img src="/logo.png" alt="Havenly" className="h-20 sm:h-24 mx-auto mb-4" />
+          <div className="w-16 h-px bg-accent mx-auto mt-2" />
           <p className="font-serif text-lg text-text-secondary mt-4 italic">
             Premium In-Person Assessment
           </p>
@@ -214,9 +205,35 @@ export default function AssessmentForm() {
             <div className="sm:col-span-2">
               <label className={labelClass}>Property Size</label>
               <div className="grid grid-cols-3 gap-3">
-                <input type="number" value={form.sqft} onChange={(e) => update("sqft", e.target.value)} placeholder="sq ft" className={inputClass} />
-                <input type="number" value={form.bedrooms} onChange={(e) => update("bedrooms", e.target.value)} placeholder="Bedrooms" className={inputClass} />
-                <input type="number" value={form.bathrooms} onChange={(e) => update("bathrooms", e.target.value)} placeholder="Bathrooms" className={inputClass} />
+                <select value={form.sqft} onChange={(e) => update("sqft", e.target.value)} className={inputClass}>
+                  <option value="">sq ft</option>
+                  <option value="Under 500">Under 500</option>
+                  <option value="500–1,000">500–1,000</option>
+                  <option value="1,000–1,500">1,000–1,500</option>
+                  <option value="1,500–2,000">1,500–2,000</option>
+                  <option value="2,000–3,000">2,000–3,000</option>
+                  <option value="3,000–5,000">3,000–5,000</option>
+                  <option value="5,000+">5,000+</option>
+                </select>
+                <select value={form.bedrooms} onChange={(e) => update("bedrooms", e.target.value)} className={inputClass}>
+                  <option value="">Bedrooms</option>
+                  <option value="Studio">Studio</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6+">6+</option>
+                </select>
+                <select value={form.bathrooms} onChange={(e) => update("bathrooms", e.target.value)} className={inputClass}>
+                  <option value="">Bathrooms</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6+">6+</option>
+                </select>
               </div>
             </div>
             <div className="sm:col-span-2">
@@ -232,8 +249,38 @@ export default function AssessmentForm() {
               <input type="text" value={form.timeline} onChange={(e) => update("timeline", e.target.value)} placeholder="Expected timeline" className={inputClass} />
             </div>
             <div className="sm:col-span-2">
-              <label className={labelClass}>Investment Range (AED)</label>
-              <ChipSelect options={["5–15K", "15–30K", "30–60K", "60K+"]} value={form.investmentRange} onChange={(v) => update("investmentRange", v as string)} />
+              <label className={labelClass}>Package</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {[
+                  { name: "Refresh", desc: "Light styling, decluttering & accessory placement" },
+                  { name: "Elevate", desc: "Partial transformation with curated furniture & decor" },
+                  { name: "Signature", desc: "Full HAVENLY transformation — styling, staging & redesign" },
+                  { name: "Bespoke", desc: "Complete luxury overhaul tailored to your vision" },
+                ].map((pkg) => {
+                  const selected = form.selectedPackage === pkg.name;
+                  return (
+                    <button
+                      key={pkg.name}
+                      type="button"
+                      onClick={() => update("selectedPackage", selected ? "" : pkg.name)}
+                      className={`text-left p-4 rounded-xl border-2 transition-all ${
+                        selected
+                          ? "border-accent bg-accent/5 shadow-sm"
+                          : "border-border bg-white hover:border-accent/30"
+                      }`}
+                    >
+                      <span className={`text-sm font-semibold font-sans block mb-1 ${selected ? "text-accent" : "text-text-primary"}`}>
+                        {pkg.name}
+                      </span>
+                      <p className="text-xs text-text-muted font-sans leading-relaxed m-0">{pkg.desc}</p>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="sm:col-span-2">
+              <label className={labelClass}>Support Staff</label>
+              <ChipSelect options={["Havenly", "By Client"]} value={form.supportStaff} onChange={(v) => update("supportStaff", v as string)} />
             </div>
           </div>
         </SectionCard>
